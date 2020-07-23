@@ -1,0 +1,13 @@
+[Unit]
+Description=node drain
+After=k3s.service docker.service systemd-resolved.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/bin/echo "Node drain reporting for duty"
+TimeoutStopSec=120s
+ExecStop=/bin/bash /usr/local/bin/node-drain.sh
+
+[Install]
+WantedBy=multi-user.target
