@@ -1,5 +1,5 @@
-
 #!/bin/bash
+# Script to automate node draining with RKE/k3s
 
 sherlock() {
 
@@ -56,6 +56,9 @@ setup() {
 
 node_drain() {
 
+  echo "Finding node name"
+  NODE_NAME=$(${KUBECTL_COMMAND} get nodes -l kubernetes.io/hostname=$(hostname -s) -o=jsonpath='{.items[0].metadata.name}')
+
   echo "Draining node"
   if [ -z "${KUBECTL_COMMAND}" ]
     then
@@ -63,14 +66,11 @@ node_drain() {
       exit 1
   fi
 
-  ${KUBECTL_COMMAND} drain $(hostname -s) --ignore-daemonsets ${DELETE_LOCAL_DATA} --timeout=100s --force
+  ${KUBECTL_COMMAND} drain ${NODE_NAME} --ignore-daemonsets ${DELETE_LOCAL_DATA} --timeout=100s --force
 
 }
 
 node_delete() {
-
-  echo "Finding node name"
-  NODE_NAME=$(${KUBECTL_COMMAND} get nodes -l kubernetes.io/hostname=$(hostname -s) -o=jsonpath='{.items[0].metadata.name}')
 
   echo "Deleting node"
   ${KUBECTL_COMMAND} delete node "${NODE_NAME}"
@@ -99,18 +99,20 @@ node_delete() {
 help() {
 
   echo "node-drain systemd service for RKE and k3s
+
   Usage: bash node-drain.sh [ -d -n -r <container runtime> ]
-  All flags are optional
-  -d    Delete local data, pods using emptyDir volumes will be drained as well
-  -n    Delete node as well, useful for immutable infrastructure as nodes are replaced on shutdown
-  -r    Override container runtime if not automatically detected (docker|k3s)"
+
+    All flags are optional:
+    -d    Delete local data, pods using emptyDir volumes will be drained as well
+    -n    Delete node as well, useful for immutable infrastructure as nodes are replaced on shutdown
+    -r    Override container runtime if not automatically detected (docker|k3s)"
 
 }
 
 # Check if we're running as root.
 if [[ $EUID -ne 0 ]]
   then
-    techo "This script must be run as root"
+    echo "This script must be run as root"
     exit 1
 fi
 
@@ -129,7 +131,7 @@ while getopts "dhnr:" opt; do
       RUNTIME_FLAG="${OPTARG}"
       ;;
     :)
-      techo "Option -$OPTARG requires an argument."
+      echo "Option -$OPTARG requires an argument."
       exit 1
       ;;
     *)
