@@ -33,6 +33,7 @@ journalctl -u node-drain
 
 ### Usage
 
+```
 bash /usr/local/bin/node-drain.sh -h
 node-drain systemd service for RKE and k3s
   Usage: bash node-drain.sh [ -d -n -r <container runtime> ]
@@ -40,3 +41,4 @@ node-drain systemd service for RKE and k3s
   -d    Delete local data, pods using emptyDir volumes will be drained as well
   -n    Delete node as well, useful for immutable infrastructure as nodes are replaced on shutdown
   -r    Override container runtime if not automatically detected (docker|k3s)
+```
