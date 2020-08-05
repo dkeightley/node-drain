@@ -48,7 +48,7 @@ setup() {
       KUBECTL_COMMAND="docker exec kubelet kubectl --kubeconfig=/etc/kubernetes/ssl/kubecfg-kube-node.yaml"
       ;;
     k3s)
-      KUBECTL_COMMAND="/usr/local/bin/kubectl"
+      KUBECTL_COMMAND="/usr/local/bin/kubectl --kubeconfig=/var/lib/rancher/k3s/agent/kubelet.kubeconfig"
       ;;
   esac
 
